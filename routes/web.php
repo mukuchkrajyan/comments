@@ -17,4 +17,10 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+//Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'ItemsController@index')->name(isset(Auth::user()->name) ? Auth::user()->name:'s');
+
+Route::get('/items', 'ItemsController@index');
+
+
+Route::get('/comments/{id}', 'CommentsController@index');

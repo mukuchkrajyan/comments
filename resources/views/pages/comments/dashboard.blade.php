@@ -9,19 +9,9 @@
         <div class="row">
             <div class="col-lg-12 margin-tb">
                 <div class="pull-left">
-                    <h2>All Items - {{ $items->total() }}</h2>
+                    <h2>Current Item Comments  - {{ $comments->count() }}</h2>
                 </div>
 
-
-                <div class="pull-right">
-                    <label for="sel1">Items per page:</label>
-                    <select class="form-control" id="sel1">
-                        @for ($i =1; $i <= 10; $i++)
-                            <option value="{{ $i }}">{{ $i }}</option>
-                        @endfor
-                    </select>
-                    <a disabled class="btn btn-success"> Create New Item</a>
-                </div>
             </div>
         </div>
 
