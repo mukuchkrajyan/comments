@@ -23,9 +23,9 @@ class ItemsController extends BaseController
         } else {
             $per_page = 4;
         }
-        print_r($per_page);
+        //print_r($per_page);
         $items = Item::orderBy('id', 'desc')->paginate($per_page);
-
+//dd($items);
         return $this->view($this->view . 'dashboard', compact('items','per_page'));
     }
 

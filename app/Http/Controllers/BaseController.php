@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 
 class BaseController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Show view.
      *
@@ -19,4 +24,5 @@ class BaseController extends Controller
     {
          return view('pages.' . $view, $data, $mergeData);
     }
+
 }

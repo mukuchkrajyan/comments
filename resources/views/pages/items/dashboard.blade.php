@@ -3,6 +3,7 @@
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 @stop
 @section('content')
+
     <article class="content items-list-page">
         <p class="success-add"></p>
 
@@ -17,7 +18,11 @@
                     <label for="sel1">Items per page:</label>
                     <select class="form-control" id="sel1">
                         @for ($i =1; $i <= 10; $i++)
-                            <option value="{{ $i }}">{{ $i }}</option>
+                            @if($per_page == $i)
+                                <option selected value="{{ $i }}">{{ $i }}</option>
+                            @else
+                                <option value="{{ $i }}">{{ $i }}</option>
+                            @endif
                         @endfor
                     </select>
                     <a disabled class="btn btn-success"> Create New Item</a>
@@ -32,7 +37,7 @@
         @endif
         <table class="table table-bordered">
             <tr>
-                <th>No </th>
+                <th>No</th>
                 <th>Title</th>
                 <th>Description</th>
                 <th width="280px">Comments</th>
@@ -63,10 +68,11 @@
 
     </article>
 @endsection
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 @section('script')
     <script>
         $(document).ready(function () {
-            $(".dashboard").addClass('active');
 
             @if ($per_page)
                 per_page = '{{ $per_page }}';
@@ -77,8 +83,9 @@
             @endif
 
             $("#sel1").change(function () {
-                if (window.location.href.indexOf('&per_page=') == -1) {
-                    new_url = window.location.href + '&per_page=' + $(this).val();
+                if (window.location.href.indexOf('per_page=') == -1) {
+                    alert(1);
+                    new_url = window.location.href + '?per_page=' + $(this).val();
                 }
                 else {
                     new_url = window.location.href.slice(0, -1) + $(this).val();

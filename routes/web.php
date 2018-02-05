@@ -18,9 +18,18 @@ Route::get('/', function () {
 Auth::routes();
 
 //Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/home', 'ItemsController@index')->name(isset(Auth::user()->name) ? Auth::user()->name:'s');
+Route::get('/home', 'ItemsController@index');
+
+Route::get('/', 'ItemsController@index');
 
 Route::get('/items', 'ItemsController@index');
 
-
 Route::get('/comments/{id}', 'CommentsController@index');
+
+Route::post('/comments/{id}/add-comment', 'CommentsController@store');
+
+
+//Route::post('/comments/{id}/add-comment', function(){
+//    echo 1;
+//});
+

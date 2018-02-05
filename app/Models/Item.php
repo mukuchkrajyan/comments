@@ -11,12 +11,12 @@ class Item extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class);
+        //return $this->hasMany('Comment', 'id');
     }
 
-    public function author()
-    {
-        return $this->belongsTo(User::class);
-    }
+
+
+
 
     /**
      * The attributes that are mass assignable.
