@@ -28,8 +28,9 @@ Route::get('/comments/{id}', 'CommentsController@index');
 
 Route::post('/comments/{id}/add-comment', 'CommentsController@store');
 
+Route::post('/comments/{id}/get-comments-now', 'CommentsController@get_comments_now');
 
-//Route::post('/comments/{id}/add-comment', function(){
-//    echo 1;
-//});
+
+
+
 

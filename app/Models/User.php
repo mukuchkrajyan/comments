@@ -6,13 +6,13 @@ use App\Models\Item;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+
 class User extends Authenticatable
 {
     use Notifiable;
 
     public function comments()
     {
-       // return $this->hasMany(Comment::class);
         return $this->hasMany('App\Models\Comment');
      }
 

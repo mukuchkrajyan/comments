@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('css')
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    {{--<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">--}}
 @stop
 @section('content')
 
@@ -17,7 +17,7 @@
                 <div class="pull-right">
                     <label for="sel1">Items per page:</label>
                     <select class="form-control" id="sel1">
-                        @for ($i =1; $i <= 10; $i++)
+                        @for ($i = 1; $i <= 10; $i++)
                             @if($per_page == $i)
                                 <option selected value="{{ $i }}">{{ $i }}</option>
                             @else
