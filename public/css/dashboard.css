@@ -5,3 +5,18 @@
 #new_comments_notify {
     display: none;
 }
+
+.typing_sexion {
+    background-color: #00FFFF;
+    width: 50%;
+    min-height: 60px;
+    display: table;
+
+}
+
+#typing_sexion_text {
+    color: black;
+    vertical-align: middle;
+    display: table-cell;
+    font-weight: bold;
+}

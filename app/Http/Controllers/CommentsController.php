@@ -28,7 +28,7 @@ class CommentsController extends BaseController
     {
         $item = Item::find($item_id);
 
-        $comments = $item->comments()->with('user')->paginate(30);
+        $comments = $item->comments()->orderBy('commentid', 'desc')->with('user')->paginate(30);
         //  dd($item->comments()->first()->user($item->comments()->first()->userid)->name);
         return $this->view($this->view . 'dashboard', compact('comments', 'item_id'));
     }
@@ -66,16 +66,39 @@ class CommentsController extends BaseController
 
         $comment->save();
 
-        if (@$request->ajax == 1) {
-            return array("description" => $description, "email" => Auth::user()->email, "name" => Auth::user()->name, "date" => $comment->created_at, "id" => $comment->id);
+
+        $new_comments = false;
+
+        $new_added_comments_count = 0;
+
+        $old_comments_count = $request->old_comments_count;
+
+        $new_comments_count = Comment::where('item_id', $item_id)->count();
+
+        if ($new_comments_count > $old_comments_count) {
+
+            $new_comments = true;
+
+            $new_added_comments_count = $new_comments_count - $old_comments_count;
+
+            $new_added_comments = Comment::orderBy('commentid', 'desc')->take($new_added_comments_count)->get();
         }
 
-        event(new MessagePosted(Auth::user(), $request->get('description')));
+        return array("new_comments_count" => $new_comments_count,
+            "new_comments" => $new_comments,
+            "new_added_comments_count" => $new_added_comments_count,
+            "new_added_comments" => $new_added_comments,
+            "description" => $description,
+            "userid" => $user_id,
+            "email" => Auth::user()->email,
+            "name" => Auth::user()->name,
+            "date" => $comment->created_at,
+            "id" => $comment->id);
 
-
-        return redirect()->back()
-            ->with('success', 'Comment added successfully');
-
+//        event(new MessagePosted(Auth::user(), $request->get('description')));
+//
+//        return redirect()->back()
+//            ->with('success', 'Comment added successfully');
     }
 
     /**
@@ -93,7 +116,7 @@ class CommentsController extends BaseController
      */
     public function get_comments_now(Request $request)
     {
-        $new_added_comments =   array();
+        $new_added_comments = array();
 
         $item_id = $request->segments()[1];   /*Getting Item ID*/
 
@@ -104,7 +127,8 @@ class CommentsController extends BaseController
         $old_comments_count = $request->old_comments_count;
 
         $new_comments_count = Comment::where('item_id', $item_id)->count();
-         if ($new_comments_count > $old_comments_count) {
+
+        if ($new_comments_count > $old_comments_count) {
 
             $new_comments = true;
 
@@ -112,7 +136,7 @@ class CommentsController extends BaseController
 
             $new_added_comments = Comment::orderBy('commentid', 'desc')->take($new_added_comments_count)->get();
         }
-         $result = array("new_comments_count" => $new_comments_count, "new_comments" => $new_comments, "new_added_comments_count" => $new_added_comments_count,"new_added_comments"=>$new_added_comments);
+        $result = array("new_comments_count" => $new_comments_count, "new_comments" => $new_comments, "new_added_comments_count" => $new_added_comments_count, "new_added_comments" => $new_added_comments);
 
         return $result;
     }

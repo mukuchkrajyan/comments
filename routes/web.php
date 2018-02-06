@@ -30,6 +30,10 @@ Route::post('/comments/{id}/add-comment', 'CommentsController@store');
 
 Route::post('/comments/{id}/get-comments-now', 'CommentsController@get_comments_now');
 
+Route::post('/comments/{id}/user-typing-now', 'CommentTypingController@typingEvent');
+
+Route::post('/comments/{id}/get-typers-now', 'CommentTypingController@getTypersNow');
+
 
 
 

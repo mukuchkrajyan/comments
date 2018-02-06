@@ -34,14 +34,16 @@
             </tr>
             @foreach ($comments as $comment)
                 <tr>
-                    <td>{{ $comment->user->id }}</td>
+                    <td>{{ $comment->commentid }}</td>
 
                     <td>{{ $comment->user->name }}</td>
 
                     <td>{{ $comment->user->email }}</td>
 
                     <td>
-                        <span>{{  htmlspecialchars_decode($comment->description) }}  </span>
+
+                        <span>{!! html_entity_decode($comment->description, ENT_QUOTES | ENT_XML1, 'UTF-8') !!}  </span>
+
                     </td>
 
                     <td>
@@ -58,14 +60,19 @@
             <input readonly name="old_comments_count" id="old_comments_count" type="hidden"
                    value="{{$comments->count()}}"/>
 
+
             <div class="form-group">
+                <div class="typing_sexion">
+                    <p id="typing_sexion_text">Nobody typing</p>
+                </div>
                 <label id="comment_label" for="comment">Type your Comment :
                     @if (Auth::check())
-                    {{  Auth::user()->name}}
+                        {{  Auth::user()->name}}
                     @endif
 
                 </label>
-                <textarea autofocus placeholder="Add Comment" class="form-control" rows="5" id="comment_area"
+                <textarea onkeypress="setTyping()" autofocus placeholder="Add Comment" class="form-control" rows="5"
+                          id="comment_area"
                           name="description"></textarea>
                 <input id="add_comment" name="add_comment" class="btn btn-success" type="button" value="Add Comment">
             </div>
@@ -111,7 +118,10 @@
             ];
         };
 
+
         function commenntUpdate() {
+
+            selfUserId = "{{  Auth::user()->id}}";
 
             /*Getrting Item Comments count before request*/
             old_comments_count = $("#old_comments_count").val();
@@ -134,27 +144,45 @@
 
                 $(".badge").text(new_added_comments_count);
 
+               // $("#old_comments_count").val(new_comments_count);
+
                 if (new_comments == true) {
-
                     $("#new_comments_notify").show('fast');
+                }
+                localStorage.setItem("new_added_comments", JSON.stringify(new_added_comments));
 
-                    localStorage.setItem("new_added_comments", JSON.stringify(new_added_comments));
+                localStorage.setItem("new_comments_count", new_comments_count);
+            });
+        }
 
-                    localStorage.setItem("new_comments_count", new_comments_count);
+        function commenntTypersUpdate() {
 
+            selfUserName = "{{  Auth::user()->name}}";
+
+            $.post("{{url('comments/'.$item_id.'/get-typers-now/')}}", {
+
+                _token: '{{ csrf_token() }}',
+
+            }, function (typers) {
+                if (typers.indexOf(selfUserName) != -1) {
+
+                }
+                if (typers.length > 0) {
+                    typers_text = typers.slice();
+                    typers_text += " Typing response ..."
+                    $("#typing_sexion_text").css("color", "darkgreen");
+                    $("#typing_sexion_text").text(typers_text);
+
+                }
+                else {
+                    $("#typing_sexion_text").text("Nobody typing");
+                    $("#typing_sexion_text").css("color", "6B6B6B");
 
                 }
             });
         }
 
         $(document).ready(function () {
-
-            $(document).keyup(function (e) {
-                if (e.keyCode == 13) {
-//enter key
-                }
-            });
-
 
             $('#new_comments_notify').click(function (e) {
 
@@ -165,6 +193,7 @@
                 new_added_comments_parsed = JSON.parse(new_added_comments);
 
                 for (i = 0; i < new_added_comments_parsed.length; i++) {
+
                     new_added_comments_parsed_curr = new_added_comments_parsed[i];
 
                     commentid = new_added_comments_parsed_curr.commentid;
@@ -194,10 +223,19 @@
                 }, 1000);
 
             });
+
             $('#add_comment').click(function (e) {
+
+                selfUserName = "{{  Auth::user()->name}}";
 
                 /*getting editor value*/
                 commented_text = CKEDITOR.instances.comment_area.getData();
+
+                if (commented_text.trim().length == 0) {
+                    alert("You must type some message ");
+
+                    return false;
+                }
 
                 $.post("{{url('comments/'.$item_id.'/add-comment')}}", {
 
@@ -213,15 +251,31 @@
 
                     email = data.email;
 
+                    userid = data.userid;
+
                     description = data.description;
 
                     name = data.name;
 
                     date = data.date.date;
 
+                    new_comments_count = data.new_comments_count;
+
+                    new_added_comments = data.new_added_comments;
+
+                    localStorage.new_comments_count = new_comments_count;
+
+                    localStorage.new_added_comments = new_added_comments;
+
+                    $("#old_comments_count").val(new_comments_count);
+
                     $("#item_comments>tbody").append("<tr style='display:none'><td>" + id + "</td> <td>" + name + "</td> <td>" + email + "</td><td>" + description + "</td><td> " + date + "</td></tr>");
 
-                    $("#item_comments>tbody>tr").show('slow');
+                    $("#item_comments>tbody>tr").show("fast");
+
+                    if (userid == selfUserName) {
+                        $("#item_comments>tbody>tr").show('slow');
+                    }
 
                 });
 
@@ -229,10 +283,33 @@
                 /*Resetting Editor value*/
             });
 
-            setInterval('commenntUpdate()', 1500);
+            setInterval('commenntUpdate()', 3000);
 
+            setInterval('commenntTypersUpdate()', 3000);
+
+            // CKEDITOR.replace('comment_area');
             CKEDITOR.replace('comment_area');
+
             /* Ckeditor set*/
+            CKEDITOR.on('instanceReady',
+                function () {
+                    this.instances.comment_area.document.on('keydown', function (event) {
+                        $.post("{{url('comments/'.$item_id.'/user-typing-now/')}}", {
+
+                            _token: '{{ csrf_token() }}',
+
+                            typing: true
+
+                        }, function (data) {
+
+                        });
+                    });
+
+                    this.instances.comment_area.document.on('keypress', function (event) {
+
+                        //console.log(event.data.$.keyCode);
+                    });
+                });
 
         });
     </script>
